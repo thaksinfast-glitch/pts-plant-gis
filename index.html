@@ -1,47 +1,1375 @@
-<!doctype html>
-<html lang="th">
+Warning: truncated output (original token count: 26707)
+Total output lines: 1852
+
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#064e3b">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PTS Plant GIS by Mr.Thaksin</title>
-  <style>
-    * { box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; margin: 0; }
-    body { font-family: system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
-    #app { width: 100%; height: 100%; border: 0; display: block; }
-    #setup { max-width: 42rem; margin: 12vh auto; padding: 1.5rem; border: 1px solid #cbd5e1; border-radius: 1rem; background: white; line-height: 1.6; }
-    #setup h1 { margin-top: 0; color: #065f46; }
-    code { overflow-wrap: anywhere; }
-  </style>
-  <script src="pages-config.js"></script>
-</head>
-<body>
-  <main id="setup" hidden>
-    <h1>PTS Plant GIS by Mr.Thaksin</h1>
-    <p>ยังไม่ได้ตั้งค่า URL เว็บแอป Apps Script</p>
-    <p>กำหนดค่า <code>PTS_APPS_SCRIPT_URL</code> ในไฟล์ <code>pages-config.js</code> ให้เป็น URL เว็บแอปที่ลงท้ายด้วย <code>/exec</code> แล้วเผยแพร่ Pages ใหม่</p>
-  </main>
-  <iframe id="app" title="PTS Plant GIS" allow="camera; geolocation" referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
+
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    (() => {
-      const url = window.PTS_APPS_SCRIPT_URL;
-      const setup = document.getElementById('setup');
-      if (!url || url.includes('PASTE_WEB_APP_URL_HERE')) {
-        setup.hidden = false;
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'Sarabun', 'sans-serif'],
+            body: ['Sarabun', 'Prompt', 'sans-serif'],
+          },
+          colors: {
+            forest: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Leaflet.js CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Prompt', 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+
+    /* Leaflet Popup Styling */
+    .leaflet-popup-content-wrapper {
+      border-radius: 0.75rem !important;
+      padding: 0 !important;
+      overflow: hidden;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    }
+    .leaflet-popup-content {
+      margin: 0 !important;
+      width: 260px !important;
+      font-family: 'Prompt', sans-serif;
+    }
+    .leaflet-container {
+      font-family: 'Prompt', sans-serif !important;
+      z-index: 10;
+    }
+
+    .mobile-bottom-nav {
+      padding-bottom: calc(0.25rem + env(safe-area-inset-bottom));
+    }
+
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid #34d399;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 640px) and (max-height: 600px) {
+      .app-header-inner { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+    }
+
+    /* Smooth Tab Transition */
+    .tab-section {
+      animation: fadeIn 0.2s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-20 md:pb-6 bg-slate-50">
+
+  <!-- ================= HEADER & TOP NAVIGATION ================= -->
+  <header class="sticky top-0 z-40 bg-forest-900 text-white shadow-sm border-b border-forest-800">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div class="app-header-inner flex items-center justify-between py-2.5 sm:py-3 gap-2">
+        <!-- Brand Title -->
+        <div class="min-w-0">
+          <h1 class="text-sm sm:text-lg font-bold tracking-tight text-white leading-tight">PTS Plant GIS</h1>
+          <p class="mt-0.5 text-[10px] leading-tight text-emerald-200/80">By Mr.Thaksin</p>
+        </div>
+
+        <!-- Controls (Teacher Mode & Guide) -->
+        <div class="flex shrink-0 items-center gap-1 sm:gap-2">
+          <div class="hidden lg:flex items-center gap-1.5 bg-forest-800 px-2.5 py-1 rounded-lg text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-emerald-100">บันทึกแล้ว:</span>
+            <strong id="headerTotalBadge" class="text-white font-bold">0</strong>
+            <span class="text-emerald-200">รายการ</span>
+          </div>
+
+          <button onclick="openGuideModal()" class="whitespace-nowrap px-2 py-2 sm:px-2.5 rounded-lg bg-forest-800 hover:bg-forest-700 text-emerald-100 text-xs sm:text-sm transition" title="คู่มือ">
+            คู่มือ
+          </button>
+        </div>
+      </div>
+
+      <!-- Teacher Active Banner -->
+      <div id="teacherActiveBanner" class="hidden mb-2 p-2 px-3 rounded-xl bg-amber-600 text-white text-xs flex flex-wrap items-center justify-between gap-2 shadow-inner">
+        <div class="font-semibold">
+          โหมดคุณครู (เปิดสิทธิ์จัดการกลุ่มและแก้ไข/ลบข้อมูลนักเรียน)
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="openTeacherDashboardModal()" class="px-2.5 py-1 rounded-lg bg-white text-amber-900 font-bold hover:bg-amber-50 transition">
+            จัดการกลุ่ม / ตั้งค่า
+          </button>
+          <button type="button" onclick="switchTab('gallery')" class="px-2.5 py-1 rounded-lg bg-amber-900/40 text-white hover:bg-amber-900/60 transition">
+            ตรวจ/แก้ไขข้อมูล
+          </button>
+          <button type="button" onclick="logoutTeacherMode()" class="px-2 py-1 rounded-lg bg-rose-900 text-white transition">
+            ออกโหมดครู
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-1.5 pt-1 pb-2 overflow-x-auto text-xs sm:text-sm font-medium">
+        <button onclick="switchTab('survey')" id="nav-desktop-survey" class="tab-btn-desktop px-3.5 py-2 rounded-lg transition">
+          📝 สำรวจพรรณไม้
+        </button>
+        <button onclick="switchTab('map')" id="nav-desktop-map" class="tab-btn-desktop px-3.5 py-2 rounded-lg transition">
+          🗺️ แผนที่ GIS
+        </button>
+        <button onclick="switchTab('gallery')" id="nav-desktop-gallery" class="tab-btn-desktop px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
+          <span>🌳 คลังพรรณไม้</span>
+          <span id="navBadgeCount" class="px-1.5 py-0.2 text-[11px] rounded bg-forest-800 text-emerald-200 font-bold">0</span>
+        </button>
+        <button onclick="switchTab('dashboard')" id="nav-desktop-dashboard" class="tab-btn-desktop px-3.5 py-2 rounded-lg transition">
+          📊 แดชบอร์ดสรุปผล
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-5">
+
+    <!-- ================= TAB 1: SURVEY FORM ================= -->
+    <section id="tab-survey" class="tab-section">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        
+        <!-- Left Help Panel -->
+        <div class="lg:col-span-4 space-y-3">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200">
+            <h2 class="text-sm font-bold text-slate-800 mb-2">ขั้นตอนการสำรวจภาคสนาม</h2>
+            <ol class="text-xs sm:text-sm text-slate-600 space-y-2 list-decimal list-inside">
+              <li>เลือกกลุ่มผู้สำรวจและโซนพื้นที่โรงเรียนพุทไธสง</li>
+              <li>ระบุชื่อพรรณไม้ ลักษณะวิสัย และจำนวนต้น</li>
+              <li>กดปุ่ม <strong>"ล็อคตำแหน่งปัจจุบัน"</strong> หรือจิ้มบนแผนที่ย่อย</li>
+              <li>ถ่ายรูปพรรณไม้และเลือกสภาพแวดล้อม</li>
+              <li>ตรวจสอบรายการครบ 9 ข้อแล้วกดบันทึก</li>
+            </ol>
+            <div class="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between">
+              <span>อ.พุทไธสง จ.บุรีรัมย์</span>
+              <span class="font-mono">15.548°N, 102.990°E</span>
+            </div>
+          </div>
+
+          <!-- Habit Color Legend -->
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+            <h3 class="text-xs font-bold text-slate-800 mb-2.5">สัญลักษณ์สีหมุดตามลักษณะวิสัย</h3>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-50 border border-emerald-100">
+                <span class="w-3 h-3 rounded-full bg-emerald-600 shrink-0"></span>
+                <span class="font-semibold text-emerald-950">🌳 ไม้ต้น (เขียว)</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-sky-50 border border-sky-100">
+                <span class="w-3 h-3 rounded-full bg-sky-600 shrink-0"></span>
+                <span class="font-semibold text-sky-950">🌿 ไม้พุ่ม (ฟ้า)</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-orange-50 border border-orange-100">
+                <span class="w-3 h-3 rounded-full bg-orange-600 shrink-0"></span>
+                <span class="font-semibold text-orange-950">🌱 ไม้ล้มลุก (ส้ม)</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-purple-50 border border-purple-100">
+                <span class="w-3 h-3 rounded-full bg-purple-600 shrink-0"></span>
+                <span class="font-semibold text-purple-950">🍃 ไม้เลื้อย (ม่วง)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Survey Form -->
+        <div class="lg:col-span-8">
+          <form id="plantSurveyForm" onsubmit="handleFormSubmit(event)" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            
+            <div class="bg-slate-100 border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-800">แบบฟอร์มบันทึกข้อมูลพรรณไม้</h2>
+                <p class="text-[11px] text-slate-500">กรอกข้อมูลให้ครบถ้วนเพื่อปักหมุดลงแผนที่ GIS โรงเรียน</p>
+              </div>
+              <button type="button" onclick="resetSurveyForm()" class="text-xs text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-2.5 py-1 rounded-lg">
+                ล้างฟอร์ม
+              </button>
+            </div>
+
+            <div class="p-4 sm:p-6 space-y-4 sm:space-y-5">
+              
+              <!-- 1. Group & Zone -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label for="groupSelect" class="block text-xs sm:text-sm font-semibold text-slate-700">
+                      1. กลุ่มที่สำรวจ <span class="text-rose-500">*</span>
+                    </label>
+                  </div>
+                  <select id="groupSelect" required onchange="validateSurveyForm()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm text-slate-800 outline-none focus:border-forest-600 focus:bg-white">
+                    <option value="" selected disabled>-- เลือกชื่อกลุ่มของคุณ --</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="zoneSelect" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                    2. โซนพื้นที่ศึกษา <span class="text-rose-500">*</span>
+                  </label>
+                  <input id="zoneSelect" type="text" list="schoolZoneSuggestions" required autocomplete="off"
+                    oninput="handleZoneChange(this.value); validateSurveyForm();"
+                    placeholder="พิมพ์ชื่อพื้นที่ เช่น สวนหย่อมหลังอาคารเรียน"
+                    class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm text-slate-800 outline-none focus:border-forest-600 focus:bg-white" />
+                  <datalist id="schoolZoneSuggestions">
+                    <option value="บริเวณหน้าเสาธง"></option>
+                    <option value="สวนหย่อมหน้าอาคาร 1"></option>
+                    <option value="ข้างอาคาร 2"></option>
+                    <option value="สวนพฤกษศาสตร์"></option>
+                    <option value="สนามกีฬา"></option>
+                    <option value="บริเวณรอบอาคารเกษตร"></option>
+                  </datalist>
+                </div>
+              </div>
+
+              <!-- 2. Plant Name & Quantity -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div class="sm:col-span-2">
+                  <label for="plantNameInput" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                    3. ชื่อพรรณไม้ (ชื่อสามัญ/พื้นบ้าน) <span class="text-rose-500">*</span>
+                  </label>
+                  <input type="text" id="plantNameInput" required oninput="validateSurveyForm()" placeholder="เช่น มะขาม, ประดู่, เฟื่องฟ้า..." class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 outline-none focus:border-forest-600 focus:bg-white" />
+                  <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
+                    <span class="text-[11px] text-slate-400">เลือกด่วน:</span>
+                    <button type="button" onclick="fillPlantSuggestion('มะขาม', 'ไม้ต้น')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded">มะขาม</button>
+                    <button type="button" onclick="fillPlantSuggestion('ประดู่', 'ไม้ต้น')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded">ประดู่</button>
+                    <button type="button" onclick="fillPlantSuggestion('เฟื่องฟ้า', 'ไม้พุ่ม')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded">เฟื่องฟ้า</button>
+                    <button type="button" onclick="fillPlantSuggestion('เข็ม', 'ไม้พุ่ม')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded">เข็ม</button>
+                    <button type="button" onclick="fillPlantSuggestion('พวงชมพู', 'ไม้เลื้อย')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded">พวงชมพู</button>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="quantityInput" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                    จำนวนต้น <span class="text-rose-500">*</span>
+                  </label>
+                  <div class="flex items-center">
+                    <button type="button" onclick="adjustQuantity(-1)" class="w-10 h-10 rounded-l-xl bg-slate-200 hover:bg-slate-300 font-bold text-slate-700 text-sm">-</button>
+                    <input type="number" id="quantityInput" value="1" min="1" max="500" required oninput="validateSurveyForm()" class="w-full h-10 text-center border-y border-slate-300 bg-white font-bold text-slate-800 text-sm outline-none" />
+                    <button type="button" onclick="adjustQuantity(1)" class="w-10 h-10 rounded-r-xl bg-slate-200 hover:bg-slate-300 font-bold text-slate-700 text-sm">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Habit Radio Pills -->
+              <div>
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                  4. ลักษณะวิสัยของพืช (Plant Habit) <span class="text-rose-500">*</span>
+                </label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="habitRadioGroup">
+                  <label class="cursor-pointer relative">
+                    <input type="radio" name="plantHabit" value="ไม้ต้น" onchange="validateSurveyForm()" class="peer sr-only" />
+                    <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 text-center transition">
+                      <div class="font-bold text-xs sm:text-sm text-slate-800">ไม้ต้น</div>
+                      <div class="text-[10px] text-slate-500">Tree</div>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer relative">
+                    <input type="radio" name="plantHabit" value="ไม้พุ่ม" onchange="validateSurveyForm()" class="peer sr-only" />
+                    <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 peer-checked:border-sky-600 peer-checked:bg-sky-50 text-center transition">
+                      <div class="font-bold text-xs sm:text-sm text-slate-800">ไม้พุ่ม</div>
+                      <div class="text-[10px] text-slate-500">Shrub</div>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer relative">
+                    <input type="radio" name="plantHabit" value="ไม้ล้มลุก" onchange="validateSurveyForm()" class="peer sr-only" />
+                    <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 peer-checked:border-orange-600 peer-checked:bg-orange-50 text-center transition">
+                      <div class="font-bold text-xs sm:text-sm text-slate-800">ไม้ล้มลุก</div>
+                      <div class="text-[10px] text-slate-500">Herb</div>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer relative">
+                    <input type="radio" name="plantHabit" value="ไม้เลื้อย" onchange="validateSurveyForm()" class="peer sr-only" />
+                    <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 peer-checked:border-purple-600 peer-checked:bg-purple-50 text-center transition">
+                      <div class="font-bold text-xs sm:text-sm text-slate-800">ไม้เลื้อย</div>
+                      <div class="text-[10px] text-slate-500">Climber</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 4. GPS Position & Mini Map -->
+              <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label class="block text-xs sm:text-sm font-bold text-slate-800">
+                      5. พิกัดตำแหน่ง GPS <span class="text-rose-500">*</span>
+                    </label>
+                    <p class="text-[11px] text-slate-500" id="gpsStatusText">กดปุ่มเพื่อล็อคพิกัดตำแหน่งที่คุณยืนอยู่</p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <button type="button" onclick="autoLockCurrentPosition()" id="btnFetchGPS" class="flex-1 sm:flex-initial bg-forest-700 hover:bg-forest-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition">
+                      🎯 ล็อคตำแหน่งปัจจุบัน
+                    </button>
+                    <button type="button" onclick="toggleLiveGpsTracking()" id="btnLiveTrack" class="bg-white hover:bg-slate-100 text-sky-900 border border-sky-300 font-semibold text-xs px-3 py-2 rounded-xl transition">
+                      ติดตามสด
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[11px] text-slate-500 mb-0.5">ละติจูด (Lat)</label>
+                    <input type="number" step="any" id="latInput" required value="15.5482" oninput="validateSurveyForm()" onchange="updateMiniMapFromInputs()" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono text-slate-800 outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-slate-500 mb-0.5">ลองจิจูด (Long)</label>
+                    <input type="number" step="any" id="lngInput" required value="102.9898" oninput="validateSurveyForm()" onchange="updateMiniMapFromInputs()" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono text-slate-800 outline-none" />
+                  </div>
+                </div>
+
+                <div class="relative rounded-xl overflow-hidden border border-slate-300">
+                  <div id="surveyMiniMap" class="w-full h-44 sm:h-52 bg-slate-200"></div>
+                  <button type="button" onclick="autoLockCurrentPosition()" class="absolute top-2 right-2 z-[400] bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs px-2.5 py-1.5 rounded-lg shadow border border-slate-200">
+                    จุดยืนของฉัน
+                  </button>
+                </div>
+              </div>
+
+              <!-- 5. Photo Upload & Preview -->
+              <div>
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                  6. รูปภาพพรรณไม้ <span class="text-rose-500">*</span>
+                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                  <div>
+                    <label for="photoInput" class="cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-forest-600 bg-slate-50 hover:bg-slate-100 rounded-xl p-4 text-center transition">
+                      <span class="text-xs sm:text-sm font-bold text-slate-800">📷 ถ่ายภาพ / อัปโหลดรูป <span class="text-rose-500">*</span></span>
+                      <span class="text-[11px] text-slate-400 mt-0.5">แตะเพื่อเปิดกล้องมือถือหรือเลือกรูป</span>
+                      <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)" class="hidden" />
+                    </label>
+                  </div>
+
+                  <div id="photoPreviewContainer" class="relative h-32 rounded-xl border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center">
+                    <div id="photoPlaceholder" class="text-center p-2 text-slate-400 text-xs">
+                      ยังไม่ได้แนบรูปภาพ <span class="text-rose-500">*</span>
+                    </div>
+                    <img id="photoPreviewImg" src="" alt="Preview" class="hidden w-full h-full object-cover" />
+                    <button type="button" id="btnRemovePhoto" onclick="clearUploadedPhoto()" class="hidden absolute top-2 right-2 bg-rose-600 text-white text-[10px] px-2 py-1 rounded">ลบ</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 6. Sunlight & Soil Environment -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                <div>
+                  <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                    7. สภาพแสงแดด <span class="text-rose-500">*</span>
+                  </label>
+                  <div class="grid grid-cols-3 gap-1.5">
+                    <label class="cursor-pointer">
+                      <input type="radio" name="sunlight" value="แดดจัด" onchange="validateSurveyForm()" class="peer sr-only" />
+                      <div class="py-2 px-1 rounded-lg border border-slate-200 bg-slate-50 peer-checked:bg-amber-50 peer-checked:border-amber-500 peer-checked:text-amber-900 text-center text-xs font-semibold">แดดจัด</div>
+                    </label>
+                    <label class="cursor-pointer">
+                      <input type="radio" name="sunlight" value="รำไร" onchange="validateSurveyForm()" class="peer sr-only" />
+                      <div class="py-2 px-1 rounded-lg border border-slate-200 bg-slate-50 peer-checked:bg-amber-50 peer-checked:border-amber-500 peer-checked:text-amber-900 text-center text-xs font-semibold">รำไร</div>
+                    </label>
+                    <label class="cursor-pointer">
+                      <input type="radio" name="sunlight" value="ร่มเงา" onchange="validateSurveyForm()" class="peer sr-only" />
+                      <div class="py-2 px-1 rounded-lg border border-slate-200 bg-slate-50 peer-checked:bg-amber-50 peer-checked:border-amber-500 peer-checked:text-amber-900 text-center text-xs font-semibold">ร่มเงา</div>
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                    8. ลักษณะสภาพดิน <span class="text-rose-500">*</span>
+                  </label>
+                  <div class="grid grid-cols-3 gap-1.5">
+                    <label class="cursor-pointer">
+                      <input type="radio" name="soilType" value="ดินร่วน" onchange="validateSurveyForm()" class="peer sr-only" />
+                      <div class="py-2 px-1 rounded-lg border border-slate-200 bg-slate-50 peer-checked:bg-emerald-50 peer-checked:border-emerald-600 peer-checked:text-emerald-900 text-center text-xs font-semibold">ดินร่วน</div>
+                    </label>
+                    <label class="cursor-pointer">
+                      <input type="radio" name="soilType" value="ดินเหนียว" onchange="validateSurveyForm()" class="peer sr-only" />
+                      <div class="py-2 px-1 rounded-lg border border-slate-200 bg-slate-50 peer-checked:bg-emerald-50 peer-checked:border-emerald-600 peer-checked:text-emerald-900 text-center text-xs font-semibold">ดินเหนียว</div>
+                    </label>
+                    <label class="cursor-pointer">
+                      <input type="radio" name="soilType" value="ดินทราย" onchange="validateSurveyForm()" class="peer sr-only" />
+                      <div class="py-2 px-1 rounded-lg border border-slate-200 bg-slate-50 peer-checked:bg-emerald-50 peer-checked:border-emerald-600 peer-checked:text-emerald-900 text-center text-xs font-semibold">ดินทราย</div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 7. Notes -->
+              <div>
+                <label for="notesInput" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                  9. การใช้ประโยชน์ / ข้อสังเกต <span class="text-rose-500">*</span>
+                </label>
+                <textarea id="notesInput" rows="2" required oninput="validateSurveyForm()" placeholder="เช่น ให้ร่มเงา, สมุนไพร, มีดอกสีเหลือง..." class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs sm:text-sm text-slate-800 outline-none focus:border-forest-600 focus:bg-white"></textarea>
+              </div>
+
+              <!-- Checklist & Submit -->
+              <div class="pt-2 space-y-3">
+                <div id="formCompletionBox" class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs space-y-2">
+                  <div class="flex items-center justify-between font-bold text-amber-900">
+                    <span id="formCompletionTitle">สถานะตรวจสอบความครบถ้วน (ต้องครบ 9 ข้อ)</span>
+                    <span id="formCompletionCounter" class="px-2 py-0.5 rounded bg-amber-200">0 / 9 ข้อ</span>
+                  </div>
+                  <div id="formChecklistPills" class="flex flex-wrap gap-1"></div>
+                </div>
+
+                <button type="submit" id="btnSubmitSurvey" disabled class="w-full py-3.5 px-6 rounded-xl bg-slate-200 text-slate-400 font-bold text-sm sm:text-base transition cursor-not-allowed">
+                  กรุณากรอกข้อมูลให้ครบทั้ง 9 ช่อง
+                </button>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: INTERACTIVE MAP ================= -->
+    <section id="tab-map" class="tab-section hidden">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+        
+        <div class="p-3 bg-forest-900 text-white flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-xs sm:text-sm font-bold">แผนที่พิกัด GIS โรงเรียนพุทไธสง</h2>
+            <p class="text-[11px] text-emerald-200">แตะที่หมุดเพื่อดูข้อมูลพืช</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <div class="inline-flex rounded-lg bg-forest-800 p-0.5 text-xs">
+              <button type="button" id="btnLayerSat" onclick="setBaseMapLayer('satellite')" class="px-2.5 py-1 rounded bg-emerald-600 text-white font-medium">ดาวเทียม</button>
+              <button type="button" id="btnLayerOsm" onclick="setBaseMapLayer('street')" class="px-2.5 py-1 rounded text-emerald-200">ถนน</button>
+            </div>
+
+            <select id="mapHabitFilter" onchange="renderMapMarkers()" class="rounded-lg bg-forest-800 border border-forest-700 text-white text-xs px-2.5 py-1.5 outline-none">
+              <option value="ALL">ทุกประเภท</option>
+              <option value="ไม้ต้น">ไม้ต้น</option>
+              <option value="ไม้พุ่ม">ไม้พุ่ม</option>
+              <option value="ไม้ล้มลุก">ไม้ล้มลุก</option>
+              <option value="ไม้เลื้อย">ไม้เลื้อย</option>
+            </select>
+
+            <button type="button" onclick="fitMapToMarkers()" class="px-2.5 py-1.5 rounded-lg bg-forest-700 hover:bg-forest-600 text-xs">
+              ดูทั้งหมด
+            </button>
+            <button type="button" onclick="exportToKml()" class="px-2.5 py-1.5 rounded-lg bg-sky-700 hover:bg-sky-600 text-xs">
+              ดาวน์โหลด KML
+            </button>
+          </div>
+        </div>
+
+        <div class="relative w-full h-[62vh] sm:h-[70vh]">
+          <div id="mainGisMap" class="w-full h-full"></div>
+          <button type="button" onclick="openGoogleMapsFromMainMap()" class="absolute top-3 left-3 z-[400] bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs px-3 py-2 rounded-xl shadow border border-slate-200">
+            🗺️ เปิดใน Google Maps
+          </button>
+          <button type="button" onclick="locateUserOnMainMap()" class="absolute top-3 right-3 z-[400] bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs px-3 py-2 rounded-xl shadow border border-slate-200">
+            📍 ตำแหน่งของฉัน
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: PLANT GALLERY & TABLE ================= -->
+    <section id="tab-gallery" class="tab-section hidden space-y-4">
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-800">คลังพรรณไม้ที่พบในโรงเรียนพุทไธสง</h2>
+            <p id="galleryRoleSubtext" class="text-xs text-slate-500">โหมดนักเรียน (ดูข้อมูลอย่างเดียว - ครูสามารถแก้ไขหรือลบได้)</p>
+          </div>
+
+          <div class="inline-flex rounded-lg bg-slate-100 p-0.5 text-xs">
+            <button type="button" id="btnViewCards" onclick="setGalleryViewMode('cards')" class="px-3 py-1.5 rounded bg-white font-semibold text-slate-800 shadow-sm">การ์ด</button>
+            <button type="button" id="btnViewTable" onclick="setGalleryViewMode('table')" class="px-3 py-1.5 rounded text-slate-600">ตาราง</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+          <div class="sm:col-span-6">
+            <input type="text" id="gallerySearchInput" oninput="renderGallery()" placeholder="ค้นหาชื่อพรรณไม้, โซน, หรือหมายเหตุ..." class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs sm:text-sm outline-none focus:bg-white focus:border-forest-600" />
+          </div>
+          <div class="sm:col-span-3">
+            <select id="galleryGroupFilter" onchange="renderGallery()" class="w-full py-2 px-3 rounded-xl border border-slate-300 bg-slate-50 text-xs sm:text-sm text-slate-700 outline-none">
+              <option value="ALL">ทุกกลุ่มผู้สำรวจ</option>
+            </select>
+          </div>
+          <div class="sm:col-span-3">
+            <select id="galleryHabitFilter" onchange="renderGallery()" class="w-full py-2 px-3 rounded-xl border border-slate-300 bg-slate-50 text-xs sm:text-sm text-slate-700 outline-none">
+              <option value="ALL">ลักษณะวิสัยทั้งหมด</option>
+              <option value="ไม้ต้น">ไม้ต้น</option>
+              <option value="ไม้พุ่ม">ไม้พุ่ม</option>
+              <option value="ไม้ล้มลุก">ไม้ล้มลุก</option>
+              <option value="ไม้เลื้อย">ไม้เลื้อย</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="galleryCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
+
+      <div id="galleryTableContainer" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-100 text-slate-700 uppercase text-[11px]">
+              <tr>
+                <th class="py-3 px-3">พรรณไม้</th>
+                <th class="py-3 px-3">ลักษณะวิสัย</th>
+                <th class="py-3 px-3 text-center">จำนวน</th>
+                <th class="py-3 px-3">โซน</th>
+                <th class="py-3 px-3">พิกัด Lat/Lng</th>
+                <th class="py-3 px-3">กลุ่ม</th>
+                <th class="py-3 px-3 text-right">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="galleryTableBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: DASHBOARD ================= -->
+    <section id="tab-dashboard" class="tab-section hidden space-y-4">
+      
+      <div class="bg-forest-900 rounded-2xl p-4 sm:p-5 text-white flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-sm">
+        <div>
+          <span class="text-[10px] bg-forest-800 text-emerald-200 px-2 py-0.5 rounded">สำหรับวิเคราะห์ในชั้นเรียน</span>
+          <h2 class="text-base sm:text-xl font-bold mt-1">สรุปผลการสำรวจพรรณไม้โรงเรียนพุทไธสง</h2>
+          <p class="text-xs text-emerald-100">ภาพรวมความหลากหลายทางชีวภาพและพื้นที่ศึกษา</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="exportToCSV()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">
+            📥 ส่งออก CSV
+          </button>
+          <button type="button" id="btnDashboardDemoData" onclick="confirmLoadDemoData()" class="hidden px-3.5 py-2 rounded-xl bg-sky-500/20 text-sky-200 border border-sky-400/30 text-xs font-semibold">
+            โหลดตัวอย่าง
+          </button>
+          <button type="button" id="btnDashboardResetData" onclick="confirmResetAllData()" class="hidden px-3.5 py-2 rounded-xl bg-rose-500/20 text-rose-200 border border-rose-400/30 text-xs font-semibold">
+            ล้างข้อมูล
+          </button>
+        </div>
+      </div>
+
+      <!-- Metric Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-white rounded-xl p-3.5 shadow-sm border border-slate-200">
+          <span class="text-[11px] text-slate-500">ต้นไม้ทั้งหมด</span>
+          <div class="text-xl sm:text-2xl font-bold text-emerald-700 mt-0.5" id="metricTotalTrees">0</div>
+          <span class="text-[10px] text-slate-400" id="metricTotalRecordsSub">จาก 0 จุด</…6707 tokens truncated…   document.getElementById('btnLayerOsm').className = 'px-2.5 py-1 rounded text-emerald-200';
+      } else {
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' }).addTo(mainMap);
+        document.getElementById('btnLayerOsm').className = 'px-2.5 py-1 rounded bg-emerald-600 text-white font-medium';
+        document.getElementById('btnLayerSat').className = 'px-2.5 py-1 rounded text-emerald-200';
+      }
+      markersLayerGroup.addTo(mainMap);
+    }
+
+    function autoLockCurrentPosition() {
+      if (!navigator.geolocation) {
+        showToast('เบราว์เซอร์ไม่รองรับ GPS', 'warning');
         return;
       }
-      try {
-        const parsed = new URL(url);
-        if (parsed.protocol !== 'https:' || parsed.hostname !== 'script.google.com' || !/^\/macros\/(?:u\/\d+\/)?s\/[^/]+\/exec\/?$/.test(parsed.pathname)) throw new Error('Invalid Apps Script URL');
-        const frame = document.getElementById('app');
-        frame.src = parsed.href;
-        frame.hidden = false;
-      } catch {
-        setup.hidden = false;
-        setup.querySelector('p').textContent = 'URL เว็บแอปไม่ถูกต้อง โปรดใช้ URL จาก Apps Script ที่ขึ้นต้นด้วย https://script.google.com/ และลงท้ายด้วย /exec';
+      document.getElementById('gpsStatusText').textContent = 'กำลังค้นหาตำแหน่ง GPS...';
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          document.getElementById('latInput').value = lat.toFixed(6);
+          document.getElementById('lngInput').value = lng.toFixed(6);
+          surveyMiniMarker.setLatLng([lat, lng]);
+          surveyMiniMap.setView([lat, lng], 18);
+          isCoordLocked = true;
+          document.getElementById('gpsStatusText').innerHTML = '<span class="text-emerald-700 font-bold">🔒 ล็อคพิกัดที่คุณยืนอยู่เรียบร้อย</span>';
+          validateSurveyForm();
+          showToast('จับพิกัด GPS สำเร็จและล็อคตำแหน่งแล้ว', 'success');
+        },
+        err => {
+          showToast('ไม่สามารถดึงพิกัดได้ ใช้พิกัดโรงเรียนแทน', 'warning');
+          document.getElementById('latInput').value = SCHOOL_CENTER.lat;
+          document.getElementById('lngInput').value = SCHOOL_CENTER.lng;
+          validateSurveyForm();
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+
+    function openGoogleMaps(lat, lng) {
+      const latitude = Number(lat);
+      const longitude = Number(lng);
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        showToast('กรุณาระบุพิกัดให้ถูกต้องก่อนเปิด Google Maps', 'warning');
+        return;
       }
-    })();
+      const center = encodeURIComponent(`${latitude},${longitude}`);
+      const mapsUrl = `https://www.google.com/maps/@?api=1&map_action=map&center=${center}&zoom=20&basemap=satellite`;
+      window.open(mapsUrl, '_blank', 'noopener');
+    }
+
+    function openGoogleMapsFromMainMap() {
+      const center = mainMap ? mainMap.getCenter() : SCHOOL_CENTER;
+      openGoogleMaps(center.lat, center.lng);
+    }
+
+    function toggleLiveGpsTracking() {
+      const btn = document.getElementById('btnLiveTrack');
+      if (!isLiveTrackingActive) {
+        if (!navigator.geolocation) return;
+        isLiveTrackingActive = true;
+        btn.textContent = 'หยุดติดตาม';
+        btn.className = 'bg-rose-600 text-white font-semibold text-xs px-3 py-2 rounded-xl';
+        watchPositionId = navigator.geolocation.watchPosition(pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          document.getElementById('latInput').value = lat.toFixed(6);
+          document.getElementById('lngInput').value = lng.toFixed(6);
+          surveyMiniMarker.setLatLng([lat, lng]);
+          surveyMiniMap.setView([lat, lng], 18);
+          validateSurveyForm();
+        }, null, { enableHighAccuracy: true });
+      } else {
+        isLiveTrackingActive = false;
+        btn.textContent = 'ติดตามสด';
+        btn.className = 'bg-white hover:bg-slate-100 text-sky-900 border border-sky-300 font-semibold text-xs px-3 py-2 rounded-xl';
+        if (watchPositionId) navigator.geolocation.clearWatch(watchPositionId);
+      }
+    }
+
+    function updateMiniMapFromInputs() {
+      const lat = parseFloat(document.getElementById('latInput').value);
+      const lng = parseFloat(document.getElementById('lngInput').value);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        surveyMiniMarker.setLatLng([lat, lng]);
+        surveyMiniMap.setView([lat, lng], surveyMiniMap.getZoom());
+      }
+    }
+
+    function locateUserOnMainMap() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        mainMap.setView([lat, lng], 18);
+        if (userLocationMarker) mainMap.removeLayer(userLocationMarker);
+        userLocationMarker = L.circleMarker([lat, lng], { radius: 8, color: '#2563eb', fillColor: '#3b82f6', fillOpacity: 0.9 }).addTo(mainMap);
+        userLocationMarker.bindPopup('ตำแหน่งของคุณ').openPopup();
+      });
+    }
+
+    function handleZoneChange(zoneName) {
+      if (SCHOOL_ZONES[zoneName]) {
+        const pos = SCHOOL_ZONES[zoneName];
+        document.getElementById('latInput').value = pos.lat.toFixed(6);
+        document.getElementById('lngInput').value = pos.lng.toFixed(6);
+        surveyMiniMarker.setLatLng([pos.lat, pos.lng]);
+        surveyMiniMap.setView([pos.lat, pos.lng], 17);
+      }
+    }
+
+    function adjustQuantity(amount) {
+      const input = document.getElementById('quantityInput');
+      let val = (parseInt(input.value, 10) || 1) + amount;
+      if (val < 1) val = 1;
+      input.value = val;
+      validateSurveyForm();
+    }
+
+    function fillPlantSuggestion(name, habit) {
+      document.getElementById('plantNameInput').value = name;
+      const radios = document.getElementsByName('plantHabit');
+      radios.forEach(r => { if (r.value === habit) r.checked = true; });
+      validateSurveyForm();
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 720;
+          let w = img.width, h = img.height;
+          if (w > MAX_WIDTH) { h = Math.round((h * MAX_WIDTH) / w); w = MAX_WIDTH; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          uploadedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          document.getElementById('photoPreviewImg').src = uploadedPhotoDataUrl;
+          document.getElementById('photoPreviewImg').classList.remove('hidden');
+          document.getElementById('photoPlaceholder').classList.add('hidden');
+          document.getElementById('btnRemovePhoto').classList.remove('hidden');
+          validateSurveyForm();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearUploadedPhoto() {
+      uploadedPhotoDataUrl = '';
+      document.getElementById('photoInput').value = '';
+      document.getElementById('photoPreviewImg').src = '';
+      document.getElementById('photoPreviewImg').classList.add('hidden');
+      document.getElementById('photoPlaceholder').classList.remove('hidden');
+      document.getElementById('btnRemovePhoto').classList.add('hidden');
+      validateSurveyForm();
+    }
+
+    function validateSurveyForm() {
+      const group = document.getElementById('groupSelect').value;
+      const zone = document.getElementById('zoneSelect').value;
+      const name = document.getElementById('plantNameInput').value.trim();
+      const qty = document.getElementById('quantityInput').value;
+      const habit = document.querySelector('input[name="plantHabit"]:checked')?.value;
+      const lat = document.getElementById('latInput').value;
+      const lng = document.getElementById('lngInput').value;
+      const sun = document.querySelector('input[name="sunlight"]:checked')?.value;
+      const soil = document.querySelector('input[name="soilType"]:checked')?.value;
+      const notes = document.getElementById('notesInput').value.trim();
+      const photo = uploadedPhotoDataUrl;
+
+      const checks = [
+        { label: 'กลุ่ม', ok: !!group },
+        { label: 'โซน', ok: !!zone },
+        { label: 'ชื่อพืช', ok: !!name },
+        { label: 'จำนวน', ok: !!qty && qty > 0 },
+        { label: 'วิสัย', ok: !!habit },
+        { label: 'พิกัด GPS', ok: !!lat && !!lng },
+        { label: 'รูปภาพ', ok: !!photo },
+        { label: 'แสงแดด', ok: !!sun },
+        { label: 'สภาพดิน', ok: !!soil },
+        { label: 'บันทึก', ok: !!notes }
+      ];
+
+      const okCount = checks.filter(c => c.ok).length;
+      const counterEl = document.getElementById('formCompletionCounter');
+      if (counterEl) counterEl.textContent = `${okCount} / 10 ข้อ`;
+
+      const pillsEl = document.getElementById('formChecklistPills');
+      if (pillsEl) {
+        pillsEl.innerHTML = checks.map(c => `<span class="px-2 py-0.5 rounded text-[11px] font-semibold ${c.ok ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">${c.ok ? '✓' : '•'} ${c.label}</span>`).join('');
+      }
+
+      const btn = document.getElementById('btnSubmitSurvey');
+      const box = document.getElementById('formCompletionBox');
+
+      if (okCount === checks.length) {
+        btn.disabled = false;
+        btn.className = 'w-full py-3.5 px-6 rounded-xl bg-forest-700 hover:bg-forest-800 text-white font-bold text-sm sm:text-base transition';
+        btn.textContent = '🌿 บันทึกข้อมูลพรรณไม้';
+        box.className = 'p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-2';
+      } else {
+        btn.disabled = true;
+        btn.className = 'w-full py-3.5 px-6 rounded-xl bg-slate-200 text-slate-400 font-bold text-sm sm:text-base transition cursor-not-allowed';
+        btn.textContent = `กรอกข้อมูลยังไม่ครบ (${okCount}/10)`;
+        box.className = 'p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs space-y-2';
+      }
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const newRecord = {
+        id: 'rec-' + Date.now(),
+        group: document.getElementById('groupSelect').value,
+        zone: document.getElementById('zoneSelect').value,
+        name: document.getElementById('plantNameInput').value.trim(),
+        quantity: parseInt(document.getElementById('quantityInput').value, 10) || 1,
+        habit: document.querySelector('input[name="plantHabit"]:checked').value,
+        lat: parseFloat(document.getElementById('latInput').value),
+        lng: parseFloat(document.getElementById('lngInput').value),
+        sunlight: document.querySelector('input[name="sunlight"]:checked').value,
+        soil: document.querySelector('input[name="soilType"]:checked').value,
+        notes: document.getElementById('notesInput').value.trim(),
+        photo: uploadedPhotoDataUrl,
+        timestamp: new Date().toLocaleDateString('th-TH') + ' ' + new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      plantRecords.unshift(newRecord);
+      if (newRecord.photo) photoSyncPending.add(newRecord.id);
+      saveRecordsToStorage();
+      renderMapMarkers();
+      renderGallery();
+      renderDashboard();
+      resetSurveyForm();
+      switchTab('gallery');
+      showToast('บันทึกข้อมูลพรรณไม้สำเร็จ!', 'success');
+    }
+
+    function resetSurveyForm() {
+      document.getElementById('plantSurveyForm').reset();
+      clearUploadedPhoto();
+      isCoordLocked = false;
+      document.getElementById('latInput').value = SCHOOL_CENTER.lat;
+      document.getElementById('lngInput').value = SCHOOL_CENTER.lng;
+      surveyMiniMarker.setLatLng([SCHOOL_CENTER.lat, SCHOOL_CENTER.lng]);
+      document.getElementById('gpsStatusText').textContent = 'กดปุ่มเพื่อล็อคพิกัดตำแหน่งที่คุณยืนอยู่';
+      validateSurveyForm();
+    }
+
+    function renderMapMarkers() {
+      if (!markersLayerGroup) return;
+      markersLayerGroup.clearLayers();
+      const habitFilter = document.getElementById('mapHabitFilter')?.value || 'ALL';
+
+      const filtered = plantRecords.filter(item => habitFilter === 'ALL' || item.habit === habitFilter);
+      const pinCountLabel = document.getElementById('mapPinCountLabel');
+      if (pinCountLabel) pinCountLabel.textContent = `${filtered.length} จุด`;
+
+      filtered.forEach(item => {
+        const cfg = HABIT_CONFIG[item.habit] || HABIT_CONFIG['ไม้ต้น'];
+        const habitIcon = HABIT_ICON[item.habit] || HABIT_ICON['ไม้ต้น'];
+        const customIcon = L.divIcon({
+          className: 'custom-pin',
+          html: `<div title="${item.habit}" style="background-color: ${cfg.color}; width: 32px; height: 32px; display:flex; align-items:center; justify-content:center; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.35); font-size:17px; line-height:1;">${habitIcon}</div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
+        });
+
+        const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+        const popupHtml = `
+          <div class="p-3 space-y-1.5 bg-white text-xs">
+            <img src="${item.photo}" class="w-full h-28 object-cover rounded-lg" onerror="this.src='https://placehold.co/600x400/065f46/ffffff?text=Plant'" />
+            <div class="flex justify-between font-bold text-slate-800">
+              <span>${item.name}</span>
+              <span class="text-emerald-700">${item.group}</span>
+            </div>
+            <div>โซน: ${item.zone} (${item.habit})</div>
+            <div>จำนวน: ${item.quantity} ต้น</div>
+            <button onclick="openGoogleMaps(${Number(item.lat)}, ${Number(item.lng)})" class="w-full py-1 bg-sky-700 text-white font-bold rounded mt-1">🗺️ เปิดตำแหน่งนี้ใน Google Maps</button>
+            ${isTeacherLoggedIn ? `<button onclick="openEditRecordModal('${item.id}')" class="w-full py-1 bg-amber-500 text-white font-bold rounded mt-1">แก้ไข</button>` : ''}
+          </div>
+        `;
+        marker.bindPopup(popupHtml);
+        markersLayerGroup.addLayer(marker);
+      });
+    }
+
+    function fitMapToMarkers() {
+      if (!mainMap || plantRecords.length === 0) return;
+      const group = new L.featureGroup(markersLayerGroup.getLayers());
+      if (group.getLayers().length > 0) mainMap.fitBounds(group.getBounds().pad(0.1));
+    }
+
+    function setGalleryViewMode(mode) {
+      galleryViewMode = mode;
+      const cardsEl = document.getElementById('galleryCardsContainer');
+      const tableEl = document.getElementById('galleryTableContainer');
+      const btnCards = document.getElementById('btnViewCards');
+      const btnTable = document.getElementById('btnViewTable');
+
+      if (mode === 'cards') {
+        cardsEl.classList.remove('hidden');
+        tableEl.classList.add('hidden');
+        btnCards.className = 'px-3 py-1.5 rounded bg-white font-semibold text-slate-800 shadow-sm';
+        btnTable.className = 'px-3 py-1.5 rounded text-slate-600';
+      } else {
+        cardsEl.classList.add('hidden');
+        tableEl.classList.remove('hidden');
+        btnTable.className = 'px-3 py-1.5 rounded bg-white font-semibold text-slate-800 shadow-sm';
+        btnCards.className = 'px-3 py-1.5 rounded text-slate-600';
+      }
+      renderGallery();
+    }
+
+    function renderGallery() {
+      const search = (document.getElementById('gallerySearchInput')?.value || '').toLowerCase();
+      const groupFilter = document.getElementById('galleryGroupFilter')?.value || 'ALL';
+      const habitFilter = document.getElementById('galleryHabitFilter')?.value || 'ALL';
+
+      const filtered = plantRecords.filter(item => {
+        const matchSearch = item.name.toLowerCase().includes(search) || item.zone.toLowerCase().includes(search) || (item.notes && item.notes.toLowerCase().includes(search));
+        const matchGroup = groupFilter === 'ALL' || item.group === groupFilter;
+        const matchHabit = habitFilter === 'ALL' || item.habit === habitFilter;
+        return matchSearch && matchGroup && matchHabit;
+      });
+
+      const cardsContainer = document.getElementById('galleryCardsContainer');
+      const tableBody = document.getElementById('galleryTableBody');
+
+      cardsContainer.innerHTML = filtered.map(item => {
+        const cfg = HABIT_CONFIG[item.habit] || HABIT_CONFIG['ไม้ต้น'];
+        return `
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+            <div class="relative h-36 bg-slate-100">
+              <img src="${item.photo}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/065f46/ffffff?text=Plant'" />
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded text-[11px] font-bold text-white shadow" style="background-color: ${cfg.color}">${item.habit}</span>
+              <span class="absolute top-2 right-2 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded font-bold">${item.quantity} ต้น</span>
+            </div>
+            <div class="p-3.5 flex-1 flex flex-col justify-between space-y-2 text-xs">
+              <div>
+                <div class="flex justify-between font-bold text-slate-800 text-sm">
+                  <span>${item.name}</span>
+                  <span class="text-emerald-700">${item.group}</span>
+                </div>
+                <div class="text-slate-500 mt-0.5">โซน: ${item.zone}</div>
+                <p class="text-slate-600 mt-1 line-clamp-2">${item.notes || '-'}</p>
+              </div>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <button onclick="focusPlantOnMap('${item.id}')" class="px-2.5 py-1.5 rounded bg-emerald-50 text-emerald-800 font-semibold">ดูแผนที่</button>
+                ${isTeacherLoggedIn ? `
+                  <div class="space-x-1">
+                    <button onclick="openEditRecordModal('${item.id}')" class="px-2 py-1 bg-amber-100 text-amber-900 rounded font-semibold">แก้ไข</button>
+                    <button onclick="confirmDeleteRecord('${item.id}')" class="px-2 py-1 bg-rose-100 text-rose-700 rounded">ลบ</button>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      tableBody.innerHTML = filtered.map(item => `
+        <tr class="hover:bg-slate-50">
+          <td class="py-2.5 px-3 font-bold text-slate-800">${item.name}</td>
+          <td class="py-2.5 px-3">${item.habit}</td>
+          <td class="py-2.5 px-3 text-center font-bold">${item.quantity}</td>
+          <td class="py-2.5 px-3">${item.zone}</td>
+          <td class="py-2.5 px-3 font-mono text-[11px]">${Number(item.lat).toFixed(4)}, ${Number(item.lng).toFixed(4)}</td>
+          <td class="py-2.5 px-3 text-emerald-800 font-semibold">${item.group}</td>
+          <td class="py-2.5 px-3 text-right">
+            <button onclick="focusPlantOnMap('${item.id}')" class="px-2 py-1 bg-slate-100 rounded text-xs">แผนที่</button>
+            ${isTeacherLoggedIn ? `
+              <button onclick="openEditRecordModal('${item.id}')" class="px-2 py-1 bg-amber-100 text-amber-900 rounded text-xs ml-1">แก้ไข</button>
+              <button onclick="confirmDeleteRecord('${item.id}')" class="px-2 py-1 bg-rose-100 text-rose-700 rounded text-xs ml-1">ลบ</button>
+            ` : ''}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function focusPlantOnMap(id) {
+      const item = plantRecords.find(r => r.id === id);
+      if (!item) return;
+      switchTab('map');
+      setTimeout(() => {
+        mainMap.setView([item.lat, item.lng], 19);
+      }, 200);
+    }
+
+    function confirmDeleteRecord(id) {
+      if (!isTeacherLoggedIn) return;
+      openCustomModal({
+        title: 'ยืนยันลบข้อมูล',
+        message: 'คุณครูต้องการลบข้อมูลรายการนี้ใช่หรือไม่?',
+        onConfirm: () => {
+          plantRecords = plantRecords.filter(r => r.id !== id);
+          saveRecordsToStorage();
+          renderMapMarkers();
+          renderGallery();
+          renderDashboard();
+          showToast('ลบรายการสำเร็จ', 'info');
+        }
+      });
+    }
+
+    function renderDashboard() {
+      const totalTrees = plantRecords.reduce((sum, r) => sum + (Number(r.quantity) || 1), 0);
+      const uniqueSpecies = new Set(plantRecords.map(r => r.name.trim())).size;
+      const activeGroups = new Set(plantRecords.map(r => r.group)).size;
+      const allGroups = Array.from(new Set([...studentGroups, ...plantRecords.map(r => r.group)]));
+
+      const zoneCounts = {};
+      Object.keys(SCHOOL_ZONES).forEach(z => zoneCounts[z] = 0);
+      plantRecords.forEach(r => { zoneCounts[r.zone] = (zoneCounts[r.zone] || 0) + (Number(r.quantity) || 1); });
+
+      let topZone = '-';
+      let topCount = 0;
+      Object.entries(zoneCounts).forEach(([z, c]) => { if (c > topCount) { topCount = c; topZone = z; } });
+
+      document.getElementById('metricTotalTrees').textContent = totalTrees;
+      document.getElementById('metricUniqueSpecies').textContent = uniqueSpecies;
+      document.getElementById('metricActiveGroups').textContent = `${activeGroups} / ${allGroups.length}`;
+      document.getElementById('metricGroupPercentSub').textContent = `${Math.round((activeGroups / Math.max(1, allGroups.length)) * 100)}% ของห้องเรียน`;
+      document.getElementById('metricTopZone').textContent = topZone;
+      document.getElementById('metricTopZoneSub').textContent = `${topCount} ต้น`;
+
+      // Habit Chart
+      const habitCounts = { "ไม้ต้น": 0, "ไม้พุ่ม": 0, "ไม้ล้มลุก": 0, "ไม้เลื้อย": 0 };
+      plantRecords.forEach(r => { if (habitCounts[r.habit] !== undefined) habitCounts[r.habit] += (Number(r.quantity) || 1); });
+
+      const habitCtx = document.getElementById('habitChartCanvas').getContext('2d');
+      if (habitChartInstance) habitChartInstance.destroy();
+      habitChartInstance = new Chart(habitCtx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(habitCounts),
+          datasets: [{ data: Object.values(habitCounts), backgroundColor: ['#059669', '#0284c7', '#ea580c', '#7c3aed'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+
+      document.getElementById('habitBreakdownBars').innerHTML = Object.entries(habitCounts).map(([h, c]) => `
+        <div class="flex justify-between items-center text-slate-700">
+          <span>${h}</span>
+          <strong class="font-bold">${c} ต้น</strong>
+        </div>
+      `).join('');
+
+      // Zone Chart
+      const zoneCtx = document.getElementById('zoneChartCanvas').getContext('2d');
+      if (zoneChartInstance) zoneChartInstance.destroy();
+      zoneChartInstance = new Chart(zoneCtx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(SCHOOL_ZONES),
+          datasets: [{ label: 'จำนวนต้นไม้', data: Object.keys(SCHOOL_ZONES).map(z => zoneCounts[z] || 0), backgroundColor: '#059669' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+
+      // Env Summary
+      const sunCounts = { "แดดจัด": 0, "รำไร": 0, "ร่มเงา": 0 };
+      const soilCounts = { "ดินร่วน": 0, "ดินเหนียว": 0, "ดินทราย": 0 };
+      plantRecords.forEach(r => {
+        if (sunCounts[r.sunlight] !== undefined) sunCounts[r.sunlight]++;
+        if (soilCounts[r.soil] !== undefined) soilCounts[r.soil]++;
+      });
+      document.getElementById('envSummaryContainer').innerHTML = `
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+          <div class="font-bold text-slate-800">สภาพแสงแดด</div>
+          <div>แดดจัด: ${sunCounts['แดดจัด']} | รำไร: ${sunCounts['รำไร']} | ร่มเงา: ${sunCounts['ร่มเงา']}</div>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+          <div class="font-bold text-slate-800">ลักษณะสภาพดิน</div>
+          <div>ดินร่วน: ${soilCounts['ดินร่วน']} | ดินเหนียว: ${soilCounts['ดินเหนียว']} | ดินทราย: ${soilCounts['ดินทราย']}</div>
+        </div>
+      `;
+
+      // Groups Leaderboard
+      document.getElementById('groupLeaderboardContainer').innerHTML = allGroups.map(g => {
+        const recs = plantRecords.filter(r => r.group === g);
+        const sub = recs.length > 0;
+        return `
+          <div class="p-2.5 rounded-xl border ${sub ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-500'}">
+            <div class="font-bold truncate">${g}</div>
+            <div class="text-[11px]">${sub ? `${recs.length} จุด` : 'ยังไม่ส่ง'}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Teacher Management
+    function handleTeacherBarClick() {
+      if (isTeacherLoggedIn) {
+        document.getElementById('teacherModalOverlay').classList.remove('hidden');
+        document.getElementById('teacherLoginView').classList.add('hidden');
+        document.getElementById('teacherPanelView').classList.remove('hidden');
+        renderTeacherGroupsList();
+      } else {
+        document.getElementById('teacherModalOverlay').classList.remove('hidden');
+        document.getElementById('teacherLoginView').classList.remove('hidden');
+        document.getElementById('teacherPanelView').classList.add('hidden');
+      }
+    }
+
+    function openTeacherDashboardModal() { handleTeacherBarClick(); }
+    function closeTeacherModal() { document.getElementById('teacherModalOverlay').classList.add('hidden'); }
+
+    function verifyTeacherLogin() {
+      const pin = document.getElementById('teacherPinInput').value.trim();
+      if (!hasGoogleSheetsBridge()) return showToast('ระบบยืนยันครูยังไม่พร้อม', 'warning');
+      google.script.run.withSuccessHandler(token => {
+        teacherAccessToken = token;
+        isTeacherLoggedIn = true;
+        updateTeacherUIState();
+        closeTeacherModal();
+        renderGallery();
+        renderMapMarkers();
+        showToast('เข้าสู่ระบบคุณครูสำเร็จ', 'success');
+      }).withFailureHandler(() => showToast('รหัสผ่านไม่ถูกต้อง', 'warning')).verifyTeacherPin(pin);
+    }
+
+    function logoutTeacherMode() {
+      isTeacherLoggedIn = false;
+      teacherAccessToken = '';
+      updateTeacherUIState();
+      closeTeacherModal();
+      renderGallery();
+      renderMapMarkers();
+      showToast('ออกจากระบบคุณครูแล้ว', 'info');
+    }
+
+    function updateTeacherUIState() {
+      const banner = document.getElementById('teacherActiveBanner');
+      if (isTeacherLoggedIn) {
+        banner.classList.remove('hidden');
+        document.getElementById('btnTeacherModeTop').textContent = 'โหมดครู (เปิดอยู่)';
+      } else {
+        banner.classList.add('hidden');
+        document.getElementById('btnTeacherModeTop').textContent = 'เข้าสู่ระบบครู';
+      }
+    }
+
+    function renderTeacherGroupsList() {
+      const container = document.getElementById('teacherGroupsListContainer');
+      document.getElementById('teacherGroupCount').textContent = studentGroups.length;
+      container.innerHTML = studentGroups.map((g, idx) => `
+        <div class="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-slate-200 text-xs">
+          <span>${g}</span>
+          <button onclick="removeStudentGroup(${idx})" class="text-rose-600 font-bold">ลบ</button>
+        </div>
+      `).join('');
+    }
+
+    function addStudentGroupFromInput() {
+      const input = document.getElementById('newGroupNameInput');
+      const val = input.value.trim();
+      if (!val) return;
+      if (!studentGroups.includes(val)) {
+        studentGroups.push(val);
+        saveGroupsToStorage();
+        renderTeacherGroupsList();
+        input.value = '';
+        showToast('เพิ่มกลุ่มสำเร็จ', 'success');
+      }
+    }
+
+    function addPresetGroups(arr) {
+      arr.forEach(g => { if (!studentGroups.includes(g)) studentGroups.push(g); });
+      saveGroupsToStorage();
+      renderTeacherGroupsList();
+      showToast('เพิ่มกลุ่มสำเร็จ', 'success');
+    }
+
+    function removeStudentGroup(idx) {
+      studentGroups.splice(idx, 1);
+      saveGroupsToStorage();
+      renderTeacherGroupsList();
+    }
+
+    function openEditRecordModal(id) {
+      const record = plantRecords.find(r => r.id === id);
+      if (!record) return;
+      document.getElementById('editRecordId').value = record.id;
+      
+      const groupEl = document.getElementById('editGroupSelect');
+      const allG = Array.from(new Set([...studentGroups, record.group]));
+      groupEl.innerHTML = allG.map(g => `<option value="${g}" ${record.group === g ? 'selected' : ''}>${g}</option>`).join('');
+
+      document.getElementById('editZoneSelect').value = record.zone;
+      document.getElementById('editPlantName').value = record.name;
+      document.getElementById('editQuantity').value = record.quantity;
+      document.getElementById('editHabitSelect').value = record.habit;
+      document.getElementById('editSunlightSelect').value = record.sunlight;
+      document.getElementById('editSoilSelect').value = record.soil;
+      document.getElementById('editLatInput').value = record.lat;
+      document.getElementById('editLngInput').value = record.lng;
+      document.getElementById('editNotesInput').value = record.notes || '';
+
+      document.getElementById('editRecordModalOverlay').classList.remove('hidden');
+    }
+
+    function closeEditRecordModal() {
+      document.getElementById('editRecordModalOverlay').classList.add('hidden');
+    }
+
+    function saveTeacherEditedRecord(e) {
+      e.preventDefault();
+      const id = document.getElementById('editRecordId').value;
+      const idx = plantRecords.findIndex(r => r.id === id);
+      if (idx === -1) return;
+
+      plantRecords[idx] = {
+        ...plantRecords[idx],
+        group: document.getElementById('editGroupSelect').value,
+        zone: document.getElementById('editZoneSelect').value,
+        name: document.getElementById('editPlantName').value.trim(),
+        quantity: parseInt(document.getElementById('editQuantity').value, 10) || 1,
+        habit: document.getElementById('editHabitSelect').value,
+        sunlight: document.getElementById('editSunlightSelect').value,
+        soil: document.getElementById('editSoilSelect').value,
+        lat: parseFloat(document.getElementById('editLatInput').value),
+        lng: parseFloat(document.getElementById('editLngInput').value),
+        notes: document.getElementById('editNotesInput').value.trim()
+      };
+
+      saveRecordsToStorage();
+      renderMapMarkers();
+      renderGallery();
+      renderDashboard();
+      closeEditRecordModal();
+      showToast('แก้ไขข้อมูลเรียบร้อยแล้ว', 'success');
+    }
+
+    function exportToCSV() {
+      if (plantRecords.length === 0) {
+        showToast('ไม่มีข้อมูลสำหรับส่งออก', 'warning');
+        return;
+      }
+      let csv = '\uFEFFกลุ่ม,โซน,ชื่อพรรณไม้,จำนวน,ลักษณะวิสัย,ละติจูด,ลองจิจูด,แสงแดด,ดิน,ข้อสังเกต,เวลา\n';
+      plantRecords.forEach(r => {
+        csv += `"${r.group}","${r.zone}","${r.name}",${r.quantity},"${r.habit}",${r.lat},${r.lng},"${r.sunlight}","${r.soil}","${r.notes || ''}","${r.timestamp}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `PTS_Plant_GIS_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      showToast('ดาวน์โหลดไฟล์ CSV เรียบร้อย', 'success');
+    }
+
+    function escapeXml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;'
+      })[char]);
+    }
+
+    function exportToKml() {
+      if (plantRecords.length === 0) {
+        showToast('ไม่มีข้อมูลสำหรับส่งออก', 'warning');
+        return;
+      }
+      const styles = {
+        'ไม้ต้น': 'grn',
+        'ไม้พุ่ม': 'blu',
+        'ไม้ล้มลุก': 'orng',
+        'ไม้เลื้อย': 'purple'
+      };
+      const placemarks = plantRecords.map(record => {
+        const style = styles[record.habit] || 'grn';
+        const title = `${HABIT_ICON[record.habit] || '🌳'} ${record.name || 'ไม่ระบุชื่อ'}`;
+        const description = [
+          `กลุ่ม: ${record.group || '-'}`,
+          `โซน: ${record.zone || '-'}`,
+          `ประเภท: ${record.habit || '-'}`,
+          `จำนวน: ${record.quantity || 1} ต้น`,
+          `พิกัด: ${record.lat}, ${record.lng}`
+        ].join('\n');
+        return `<Placemark><name>${escapeXml(title)}</name><description>${escapeXml(description)}</description><styleUrl>#${style}</styleUrl><Point><coordinates>${Number(record.lng)},${Number(record.lat)},0</coordinates></Point></Placemark>`;
+      }).join('');
+      const kml = `<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>PTS Plant GIS</name>
+        <Style id="grn"><IconStyle><scale>1.2</scale><Icon><href>https://maps.google.com/mapfiles/kml/paddle/grn-circle.png</href></Icon></IconStyle></Style>
+        <Style id="blu"><IconStyle><scale>1.2</scale><Icon><href>https://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href></Icon></IconStyle></Style>
+        <Style id="orng"><IconStyle><scale>1.2</scale><Icon><href>https://maps.google.com/mapfiles/kml/paddle/orange-circle.png</href></Icon></IconStyle></Style>
+        <Style id="purple"><IconStyle><scale>1.2</scale><Icon><href>https://maps.google.com/mapfiles/kml/paddle/purple-circle.png</href></Icon></IconStyle></Style>
+        ${placemarks}</Document></kml>`;
+      const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `PTS_Plant_GIS_${new Date().toISOString().slice(0, 10)}.kml`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('ดาวน์โหลด KML สำหรับเปิดใน Google Earth แล้ว', 'success');
+    }
+
+    function confirmResetAllData() {
+      openCustomModal({
+        title: 'ยืนยันล้างข้อมูลทั้งหมด',
+        message: 'ต้องการลบข้อมูลทั้งหมดในระบบใช่หรือไม่?',
+        onConfirm: () => {
+          plantRecords = [];
+          photoSyncPending.clear();
+          saveRecordsToStorage('reset');
+          renderMapMarkers();
+          renderGallery();
+          renderDashboard();
+          showToast('ล้างข้อมูลทั้งหมดแล้ว', 'info');
+        }
+      });
+    }
+
+    function openGuideModal() {
+      openCustomModal({
+        title: 'คู่มือการใช้งาน PTS Plant GIS',
+        message: `
+          <div class="space-y-2 text-xs">
+            <p><strong>นักเรียน:</strong> ถือสมาร์ตโฟนลงพื้นที่ เลือกกลุ่มและโซน ถ่ายรูป ล็อค GPS และกรอกให้ครบ 10 ข้อเพื่อบันทึก</p>
+            <p><strong>คุณครู:</strong> กดเข้าสู่ระบบครูเพื่อเพิ่มกลุ่มเรียน และตรวจแก้ไขหรือลบข้อมูลของนักเรียนได้</p>
+          </div>
+        `
+      });
+    }
+
+    function openCustomModal({ title, message, onConfirm }) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalMessage').innerHTML = message;
+      const actions = document.getElementById('modalActions');
+      if (onConfirm) {
+        actions.innerHTML = `
+          <button type="button" onclick="closeCustomModal()" class="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs">ยกเลิก</button>
+          <button type="button" id="modalConfirmBtn" class="px-3 py-1.5 bg-forest-700 text-white rounded-lg text-xs font-bold">ยืนยัน</button>
+        `;
+        document.getElementById('modalConfirmBtn').onclick = () => {
+          onConfirm();
+          closeCustomModal();
+        };
+      } else {
+        actions.innerHTML = `<button type="button" onclick="closeCustomModal()" class="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs">ปิด</button>`;
+      }
+      document.getElementById('customModalOverlay').classList.remove('hidden');
+    }
+
+    function closeCustomModal() {
+      document.getElementById('customModalOverlay').classList.add('hidden');
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-800 text-white' : type === 'warning' ? 'bg-amber-700 text-white' : 'bg-slate-800 text-white';
+      toast.className = `px-3.5 py-2 rounded-xl text-xs font-medium shadow-lg transition transform translate-y-1 opacity-0 ${bg}`;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(() => { toast.classList.remove('translate-y-1', 'opacity-0'); }, 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-1');
+        setTimeout(() => toast.remove(), 250);
+      }, 2500);
+    }
   </script>
 </body>
 </html>
+
+
+
