@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 26917)
+Total output lines: 1863
+
 <!DOCTYPE html>
 <html lang="th" class="scroll-smooth">
 <head>
@@ -688,7 +691,7 @@
       <div id="teacherLoginView" class="p-4 space-y-3 text-xs sm:text-sm">
         <p class="text-slate-600">กรอกรหัสผ่านคุณครูเพื่อจัดการรายชื่อกลุ่มนักเรียนใน Dropdown และตรวจแก้ไข/ลบข้อมูลนักเรียน</p>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">รหัสผ่านคุณครู (ค่าเริ่มต้น: 1234)</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">รหัสผ่านคุณครู</label>
           <div class="flex gap-2">
             <input type="password" id="teacherPinInput" placeholder="รหัสผ่าน..." onkeydown="if(event.key==='Enter') verifyTeacherLogin()" class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm outline-none" />
             <button type="button" onclick="verifyTeacherLogin()" class="px-4 py-2 rounded-xl bg-amber-600 text-white font-bold text-xs">เข้าสู่ระบบ</button>
@@ -733,214 +736,7 @@
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[11px] text-slate-500 mb-1">กลุ่ม</label>
-            <select id="editGroupSelect" required class="w-full rounded-lg border border-slate-300 p-2 text-xs"></select>
-          </div>
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">โซน</label>
-            <select id="editZoneSelect" required class="w-full rounded-lg border border-slate-300 p-2 text-xs">
-              <option value="บริเวณหน้าเสาธง">บริเวณหน้าเสาธง</option>
-              <option value="สวนหย่อมหน้าอาคาร 1">สวนหย่อมหน้าอาคาร 1</option>
-              <option value="ข้างอาคาร 2">ข้างอาคาร 2</option>
-              <option value="สวนพฤกษศาสตร์">สวนพฤกษศาสตร์</option>
-              <option value="สนามกีฬา">สนามกีฬา</option>
-              <option value="บริเวณรอบอาคารเกษตร">บริเวณรอบอาคารเกษตร</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2">
-          <div class="col-span-2">
-            <label class="block text-[11px] text-slate-500 mb-1">ชื่อพรรณไม้</label>
-            <input type="text" id="editPlantName" required class="w-full rounded-lg border border-slate-300 p-2 text-xs" />
-          </div>
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">จำนวน</label>
-            <input type="number" id="editQuantity" min="1" required class="w-full rounded-lg border border-slate-300 p-2 text-xs font-bold" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2">
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">ลักษณะวิสัย</label>
-            <select id="editHabitSelect" required class="w-full rounded-lg border border-slate-300 p-2 text-xs">
-              <option value="ไม้ต้น">ไม้ต้น</option>
-              <option value="ไม้พุ่ม">ไม้พุ่ม</option>
-              <option value="ไม้ล้มลุก">ไม้ล้มลุก</option>
-              <option value="ไม้เลื้อย">ไม้เลื้อย</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">แสงแดด</label>
-            <select id="editSunlightSelect" required class="w-full rounded-lg border border-slate-300 p-2 text-xs">
-              <option value="แดดจัด">แดดจัด</option>
-              <option value="รำไร">รำไร</option>
-              <option value="ร่มเงา">ร่มเงา</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">ดิน</label>
-            <select id="editSoilSelect" required class="w-full rounded-lg border border-slate-300 p-2 text-xs">
-              <option value="ดินร่วน">ดินร่วน</option>
-              <option value="ดินเหนียว">ดินเหนียว</option>
-              <option value="ดินทราย">ดินทราย</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">Lat</label>
-            <input type="number" step="any" id="editLatInput" required class="w-full rounded-lg border border-slate-300 p-2 text-xs font-mono" />
-          </div>
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">Lng</label>
-            <input type="number" step="any" id="editLngInput" required class="w-full rounded-lg border border-slate-300 p-2 text-xs font-mono" />
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-[11px] text-slate-500 mb-1">การใช้ประโยชน์</label>
-          <textarea id="editNotesInput" rows="2" required class="w-full rounded-lg border border-slate-300 p-2 text-xs"></textarea>
-        </div>
-
-        <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="closeEditRecordModal()" class="px-3 py-1.5 bg-slate-100 rounded-lg text-xs">ยกเลิก</button>
-          <button type="submit" class="px-4 py-1.5 bg-forest-700 text-white rounded-lg font-bold text-xs">บันทึกการแก้ไข</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ================= CUSTOM MODAL & TOASTS ================= -->
-  <div id="customModalOverlay" class="fixed inset-0 z-50 hidden bg-slate-950/50 backdrop-blur-sm flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-4 shadow-lg border border-slate-200">
-      <h3 id="modalTitle" class="text-sm font-bold text-slate-800 mb-1.5">แจ้งเตือน</h3>
-      <div id="modalMessage" class="text-xs text-slate-600 mb-4"></div>
-      <div id="modalActions" class="flex justify-end gap-2">
-        <button type="button" onclick="closeCustomModal()" class="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs">ปิด</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="toastContainer" class="fixed top-16 right-3 z-50 space-y-1.5 pointer-events-none"></div>
-
-  <!-- ================= APPLICATION JAVASCRIPT ================= -->
-  <script>
-    const STORAGE_KEY = 'pts_plant_gis_records_v1';
-    const GROUPS_STORAGE_KEY = 'pts_plant_gis_groups_v1';
-    const TEACHER_PIN_KEY = 'pts_plant_gis_teacher_pin_v1';
-    
-    const SCHOOL_CENTER = { lat: 15.5480, lng: 102.9900 };
-    const SCHOOL_ZONES = {
-      "บริเวณหน้าเสาธง": { lat: 15.5485, lng: 102.9895 },
-      "สวนหย่อมหน้าอาคาร 1": { lat: 15.5481, lng: 102.9899 },
-      "ข้างอาคาร 2": { lat: 15.5478, lng: 102.9904 },
-      "สวนพฤกษศาสตร์": { lat: 15.5475, lng: 102.9892 },
-      "สนามกีฬา": { lat: 15.5490, lng: 102.9910 },
-      "บริเวณรอบอาคารเกษตร": { lat: 15.5470, lng: 102.9901 }
-    };
-
-    const HABIT_CONFIG = {
-      "ไม้ต้น": { color: "#059669", bg: "#d1fae5" },
-      "ไม้พุ่ม": { color: "#0284c7", bg: "#e0f2fe" },
-      "ไม้ล้มลุก": { color: "#ea580c", bg: "#ffedd5" },
-      "ไม้เลื้อย": { color: "#7c3aed", bg: "#f3e8ff" }
-    };
-    const HABIT_ICON = {
-      "ไม้ต้น": "🌳",
-      "ไม้พุ่ม": "🌿",
-      "ไม้ล้มลุก": "🌱",
-      "ไม้เลื้อย": "🍃"
-    };
-
-    let plantRecords = [];
-    let studentGroups = [];
-    let isTeacherLoggedIn = false;
-    let teacherPin = '1234';
-    let editTempPhotoDataUrl = '';
-    let currentTab = 'survey';
-    let galleryViewMode = 'cards';
-    let uploadedPhotoDataUrl = '';
-
-    let mainMap = null;
-    let surveyMiniMap = null;
-    let markersLayerGroup = null;
-    let surveyMiniMarker = null;
-    let userLocationMarker = null;
-    let habitChartInstance = null;
-    let zoneChartInstance = null;
-    let isCoordLocked = false;
-    let isLiveTrackingActive = false;
-    let watchPositionId = null;
-    let sheetSyncTimer = null;
-    const photoSyncPending = new Set();
-
-    function getInitialDemoData() {
-      return [
-        {
-          id: 'demo-1',
-          group: 'กลุ่มที่ 1',
-          zone: 'สวนหย่อมหน้าอาคาร 1',
-          name: 'มะขาม',
-          quantity: 2,
-          habit: 'ไม้ต้น',
-          lat: 15.5481,
-          lng: 102.9899,
-          sunlight: 'แดดจัด',
-          soil: 'ดินร่วน',
-          notes: 'ให้ร่มเงาบริเวณหน้าอาคารเรียน',
-          photo: 'https://placehold.co/600x400/065f46/ffffff?text=Tamarind',
-          timestamp: '02/11/2026 09:30'
-        },
-        {
-          id: 'demo-2',
-          group: 'กลุ่มที่ 2',
-          zone: 'สนามกีฬา',
-          name: 'ประดู่',
-          quantity: 4,
-          habit: 'ไม้ต้น',
-          lat: 15.5490,
-          lng: 102.9910,
-          sunlight: 'แดดจัด',
-          soil: 'ดินร่วน',
-          notes: 'ไม้ประดับยืนต้นขนาดใหญ่ริมสนาม',
-          photo: 'https://placehold.co/600x400/047857/ffffff?text=Padauk',
-          timestamp: '02/11/2026 10:15'
-        },
-        {
-          id: 'demo-3',
-          group: 'กลุ่มที่ 3',
-          zone: 'บริเวณหน้าเสาธง',
-          name: 'เข็ม',
-          quantity: 15,
-          habit: 'ไม้พุ่ม',
-          lat: 15.5485,
-          lng: 102.9895,
-          sunlight: 'แดดจัด',
-          soil: 'ดินร่วน',
-          notes: 'ปลูกเป็นแนวรั้วหน้าเสาธง',
-          photo: 'https://placehold.co/600x400/0284c7/ffffff?text=Ixora',
-          timestamp: '02/11/2026 10:40'
-        },
-        {
-          id: 'demo-4',
-          group: 'กลุ่มที่ 4',
-          zone: 'สวนพฤกษศาสตร์',
-          name: 'พวงชมพู',
-          quantity: 3,
-          habit: 'ไม้เลื้อย',
-          lat: 15.5475,
-          lng: 102.9892,
-          sunlight: 'รำไร',
-          soil: 'ดินร่วน',
-          notes: 'เลื้อยเกาะซุ้มไม้ในสวนพฤกษศาสตร์',
-          photo: 'https://placehold.co/600x400/7c3aed/ffffff?text=CoralVine',
-          timestamp: '02/11/2026 11:05'
-        }
-      ];
-    }
-
+            <label class="block text-[11px] text-slate-500 mb-1">กลุ่ม</label…1917 tokens truncated…
     function getDefaultGroups() {
       return ['กลุ่มที่ 1', 'กลุ่มที่ 2', 'กลุ่มที่ 3', 'กลุ่มที่ 4', 'กลุ่มที่ 5', 'กลุ่มที่ 6', 'กลุ่มที่ 7', 'กลุ่มที่ 8'];
     }
@@ -984,9 +780,9 @@
     function loadRecordsFromStorage() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        plantRecords = raw ? JSON.parse(raw) : getInitialDemoData();
+        plantRecords = raw ? JSON.parse(raw).filter(record => !String(record.id).startsWith('demo-')) : [];
       } catch (err) {
-        plantRecords = getInitialDemoData();
+        plantRecords = [];
       }
       updateBadgesAndCounters();
     }
@@ -1678,7 +1474,7 @@
         renderMapMarkers();
         showToast('เข้าสู่ระบบคุณครูสำเร็จ', 'success');
       } else {
-        showToast('รหัสผ่านไม่ถูกต้อง (ค่าเริ่มต้น: 1234)', 'warning');
+        showToast('รหัสผ่านไม่ถูกต้อง', 'warning');
       }
     }
 
@@ -1856,15 +1652,6 @@
       showToast('ดาวน์โหลด KML สำหรับเปิดใน Google Earth แล้ว', 'success');
     }
 
-    function confirmLoadDemoData() {
-      plantRecords = getInitialDemoData();
-      saveRecordsToStorage();
-      renderMapMarkers();
-      renderGallery();
-      renderDashboard();
-      showToast('โหลดข้อมูลตัวอย่างแล้ว', 'success');
-    }
-
     function confirmResetAllData() {
       openCustomModal({
         title: 'ยืนยันล้างข้อมูลทั้งหมด',
@@ -1887,7 +1674,7 @@
         message: `
           <div class="space-y-2 text-xs">
             <p><strong>นักเรียน:</strong> ถือสมาร์ตโฟนลงพื้นที่ เลือกกลุ่มและโซน ถ่ายรูป ล็อค GPS และกรอกให้ครบ 10 ข้อเพื่อบันทึก</p>
-            <p><strong>คุณครู:</strong> กดเข้าสู่ระบบครู (รหัส 1234) เพื่อเพิ่มกลุ่มเรียน และตรวจแก้ไขหรือลบข้อมูลของนักเรียนได้</p>
+            <p><strong>คุณครู:</strong> กดเข้าสู่ระบบครู (รหัส 113333) เพื่อเพิ่มกลุ่มเรียน และตรวจแก้ไขหรือลบข้อมูลของนักเรียนได้</p>
           </div>
         `
       });
@@ -1932,5 +1719,6 @@
   </script>
 </body>
 </html>
+
 
 
