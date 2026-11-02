@@ -56,6 +56,31 @@ function getSnapshot() {
   return { initialized, records, groups, photoRecordIds: [...photoMap.keys()] };
 }
 
+function verifyTeacherPin(pin) {
+  const cache = CacheService.getScriptCache();
+  const key = 'PTS_TEACHER_PIN_ATTEMPTS';
+  const attempts = Number(cache.get(key) || 0);
+  if (attempts >= 10) throw new Error('ลองรหัสผ่านมากเกินไป โปรดลองภายหลัง');
+  const expected = PropertiesService.getScriptProperties().getProperty('PTS_TEACHER_PIN_SHA256');
+  if (!expected || sha256_(String(pin || '')) !== expected) {
+    cache.put(key, String(attempts + 1), 600);
+    throw new Error('รหัสผ่านไม่ถูกต้อง');
+  }
+  cache.remove(key);
+  const token = Utilities.getUuid();
+  cache.put('PTS_TEACHER_SESSION_' + token, '1', 21600);
+  return token;
+}
+
+function isTeacherToken_(token) {
+  return Boolean(token && CacheService.getScriptCache().get('PTS_TEACHER_SESSION_' + token));
+}
+
+function sha256_(value) {
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, value)
+    .map(byte => ('0' + ((byte + 256) % 256).toString(16)).slice(-2)).join('');
+}
+
 function saveSnapshot(payload) {
   if (!payload || !Array.isArray(payload.records) || !Array.isArray(payload.groups)) {
     throw new Error('รูปแบบข้อมูลสำหรับซิงก์ไม่ถูกต้อง');
@@ -65,6 +90,8 @@ function saveSnapshot(payload) {
   lock.waitLock(20000);
   try {
     const sheets = ensureSheets_();
+    const isTeacher = isTeacherToken_(payload.teacherToken);
+    if (payload.clearRecords && !isTeacher) throw new Error('ต้องเข้าสู่ระบบครูเพื่อลบข้อมูล');
     const incomingRecords = payload.records
       .filter(record => record && record.id && !String(record.id).startsWith('demo-'))
       .map(record => [
@@ -79,7 +106,10 @@ function saveSnapshot(payload) {
     const nextRecords = payload.clearRecords
       ? new Map()
       : new Map(previousRecords);
-    incomingRecords.forEach(row => nextRecords.set(String(row[0]), row));
+    incomingRecords.forEach(row => {
+      const id = String(row[0]);
+      if (isTeacher || !previousRecords.has(id)) nextRecords.set(id, row);
+    });
     const records = [...nextRecords.values()];
     const changes = [];
     records.forEach(row => {
@@ -92,7 +122,9 @@ function saveSnapshot(payload) {
     });
 
     const oldGroups = readDataRows_(sheets.groups, 1).map(row => String(row[0] || '')).filter(Boolean);
-    const nextGroups = [...new Set(payload.groups.map(group => safeText_(group).trim()).filter(Boolean))];
+    const nextGroups = isTeacher
+      ? [...new Set(payload.groups.map(group => safeText_(group).trim()).filter(Boolean))]
+      : oldGroups;
     nextGroups.filter(group => !oldGroups.includes(group)).forEach(group => {
       changes.push(['เพิ่มกลุ่ม', '', group, '', '', '', '', '', '', '', '', '', '', '']);
     });
@@ -100,7 +132,10 @@ function saveSnapshot(payload) {
       changes.push(['ลบกลุ่ม', '', group, '', '', '', '', '', '', '', '', '', '', '']);
     });
 
-    const photoUploads = savePhotos_(sheets.photos, Array.isArray(payload.photos) ? payload.photos : new Set(), new Set(records.map(row => String(row[0]))));
+    const permittedPhotoIds = new Set(isTeacher
+      ? records.map(row => String(row[0]))
+      : incomingRecords.filter(row => !previousRecords.has(String(row[0]))).map(row => String(row[0])));
+    const photoUploads = savePhotos_(sheets.photos, Array.isArray(payload.photos) ? payload.photos : [], permittedPhotoIds);
     photoUploads.forEach(id => {
       const row = nextRecords.get(id);
       if (row) changes.push(['อัปเดตรูปภาพ', ...row]);
@@ -218,3 +253,4 @@ function savePhotos_(sheet, uploads, currentRecordIds) {
   replaceRows_(sheet, PHOTO_HEADERS.length, [...keepRows, ...newRows]);
   return [...validUploads.keys()];
 }
+
