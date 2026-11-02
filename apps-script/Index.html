@@ -1,5 +1,5 @@
-Warning: truncated output (original token count: 26859)
-Total output lines: 1861
+Warning: truncated output (original token count: 26904)
+Total output lines: 1860
 
 <!DOCTYPE html>
 <html lang="th" class="scroll-smooth">
@@ -600,9 +600,7 @@ Total output lines: 1861
           <button type="button" id="btnDashboardDemoData" onclick="confirmLoadDemoData()" class="hidden px-3.5 py-2 rounded-xl bg-sky-500/20 text-sky-200 border border-sky-400/30 text-xs font-semibold">
             โหลดตัวอย่าง
           </button>
-          <button type="button" id="btnDashboardResetData" onclick="confirmResetAllData()" class="hidden px-3.5 py-2 rounded-xl bg-rose-500/20 text-rose-200 bo…6859 tokens truncated…'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(mainMap);
-        document.getElementById('btnLayerSat').className = 'px-2.5 py-1 rounded bg-emerald-600 text-white font-medium';
-        document.getElementById('btnLayerOsm').className = 'px-2.5 py-1 rounded text-emerald-200';
+          <button type="button" id="btnDashboardResetData" onclick="confirmResetAllData()" class="hidden px-3.5 py-2 rounded-xl bg-rose-500/20 text-rose-200 bo…6904 tokens truncated…   document.getElementById('btnLayerOsm').className = 'px-2.5 py-1 rounded text-emerald-200';
       } else {
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' }).addTo(mainMap);
         document.getElementById('btnLayerOsm').className = 'px-2.5 py-1 rounded bg-emerald-600 text-white font-medium';
@@ -1114,20 +1112,21 @@ Total output lines: 1861
 
     function verifyTeacherLogin() {
       const pin = document.getElementById('teacherPinInput').value.trim();
-      if (pin === teacherPin) {
+      if (!hasGoogleSheetsBridge()) return showToast('ระบบยืนยันครูยังไม่พร้อม', 'warning');
+      google.script.run.withSuccessHandler(token => {
+        teacherAccessToken = token;
         isTeacherLoggedIn = true;
         updateTeacherUIState();
         closeTeacherModal();
         renderGallery();
         renderMapMarkers();
         showToast('เข้าสู่ระบบคุณครูสำเร็จ', 'success');
-      } else {
-        showToast('รหัสผ่านไม่ถูกต้อง', 'warning');
-      }
+      }).withFailureHandler(() => showToast('รหัสผ่านไม่ถูกต้อง', 'warning')).verifyTeacherPin(pin);
     }
 
     function logoutTeacherMode() {
       isTeacherLoggedIn = false;
+      teacherAccessToken = '';
       updateTeacherUIState();
       closeTeacherModal();
       renderGallery();
