@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#064e3b">
+  <title>PTS Plant GIS by Mr.Thaksin</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body { font-family: system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
+    #app { width: 100%; height: 100%; border: 0; display: block; }
+    #setup { max-width: 42rem; margin: 12vh auto; padding: 1.5rem; border: 1px solid #cbd5e1; border-radius: 1rem; background: white; line-height: 1.6; }
+    #setup h1 { margin-top: 0; color: #065f46; }
+    code { overflow-wrap: anywhere; }
+  </style>
+  <script src="pages-config.js"></script>
+</head>
+<body>
+  <main id="setup" hidden>
+    <h1>PTS Plant GIS by Mr.Thaksin</h1>
+    <p>ยังไม่ได้ตั้งค่า URL เว็บแอป Apps Script</p>
+    <p>กำหนดค่า <code>PTS_APPS_SCRIPT_URL</code> ในไฟล์ <code>pages-config.js</code> ให้เป็น URL เว็บแอปที่ลงท้ายด้วย <code>/exec</code> แล้วเผยแพร่ Pages ใหม่</p>
+  </main>
+  <iframe id="app" title="PTS Plant GIS" allow="camera; geolocation" referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
+  <script>
+    (() => {
+      const url = window.PTS_APPS_SCRIPT_URL;
+      const setup = document.getElementById('setup');
+      if (!url || url.includes('PASTE_WEB_APP_URL_HERE')) {
+        setup.hidden = false;
+        return;
+      }
+      try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== 'https:' || parsed.hostname !== 'script.google.com' || !/^\/macros\/(?:u\/\d+\/)?s\/[^/]+\/exec\/?$/.test(parsed.pathname)) throw new Error('Invalid Apps Script URL');
+        const frame = document.getElementById('app');
+        frame.src = parsed.href;
+        frame.hidden = false;
+      } catch {
+        setup.hidden = false;
+        setup.querySelector('p').textContent = 'URL เว็บแอปไม่ถูกต้อง โปรดใช้ URL จาก Apps Script ที่ขึ้นต้นด้วย https://script.google.com/ และลงท้ายด้วย /exec';
+      }
+    })();
+  </script>
+</body>
+</html>
