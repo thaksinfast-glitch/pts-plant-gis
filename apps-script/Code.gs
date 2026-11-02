@@ -1,4 +1,3 @@
-const SPREADSHEET_ID = '1b9sz7QYLgjs-5W55oOSK_zpbWUFF96TZxCbWQcaQogU';
 const RECORDS_SHEET_NAME = 'ชีต1';
 const GROUPS_SHEET_NAME = 'กลุ่มสำรวจ';
 const HISTORY_SHEET_NAME = 'ประวัติการเปลี่ยนแปลง';
@@ -158,7 +157,9 @@ function saveSnapshot(payload) {
 }
 
 function ensureSheets_() {
-  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const spreadsheetId = PropertiesService.getScriptProperties().getProperty('PTS_SPREADSHEET_ID');
+  if (!spreadsheetId) throw new Error('ยังไม่ได้ตั้งค่า PTS_SPREADSHEET_ID ใน Script Properties');
+  const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
   const records = spreadsheet.getSheets()[0];
   ensureHeader_(records, RECORD_HEADERS);
   const groups = getOrCreateSheet_(spreadsheet, GROUPS_SHEET_NAME, ['ชื่อกลุ่ม']);
